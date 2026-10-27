@@ -43,6 +43,12 @@ label{display:block;font-weight:600;margin:12px 0 4px}
 .msg{color:var(--ok);font-weight:600;min-height:1.4em}
 textarea{min-height:140px;font:13px/1.3 ui-monospace,Menlo,Consolas,monospace}
 h2{font-size:1.1rem;margin:6px 0}
+.tb{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:12px;font-size:.9rem}
+.tb th,.tb td{border:1px solid var(--line);padding:6px;text-align:right;word-wrap:break-word}
+.tb th{font-size:.8rem;font-weight:700;background:var(--bg)}
+.tb th:first-child,.tb td:first-child{text-align:left;width:36%}
+.tb th:nth-child(2),.tb td:nth-child(2){width:16%}
+@media print{header,nav,.noprint{display:none!important}main{padding:0;max-width:none}.item{border:0;padding:0}html,body{background:#fff!important;color:#000!important}:root:not([data-theme="x"]){--bg:#fff;--card:#fff;--ink:#000;--line:#888;--mute:#333;--bad:#B3261E}}
 </style>
 </head>
 <body>
@@ -149,8 +155,11 @@ S.invoices.push(inv);addClient(inv.client);save();cart=[];client="";shown=inv;re
 }
 function renderShown(){
 var v=shown,sh=shop(),h='<div class="item">'+(sh.name||sh.addr||sh.tel||sh.logo?'<div style="text-align:center;padding-bottom:12px;margin-bottom:12px;border-bottom:2px solid var(--tape)">'+(sh.logo?'<img src="'+sh.logo+'" alt="Logo" style="max-height:72px;max-width:60%;margin-bottom:6px">':'')+(sh.name?'<div class="name" style="font-size:1.25rem">'+esc(sh.name)+'</div>':'')+(sh.addr?'<div class="sub">'+esc(sh.addr)+'</div>':'')+(sh.tel?'<div class="sub">Tél. : '+esc(sh.tel)+'</div>':'')+'</div>':'')+'<h2>Facture '+esc(v.no)+'</h2><div class="sub">'+esc(v.date)+(v.client?'<br>Client : '+esc(v.client):'')+'</div>';
-v.lines.forEach(function(l){h+='<div class="top" style="margin-top:10px"><span>'+esc(l.name)+'<br><span class="sub">'+l.qty+' × '+fmt(l.price)+'</span></span><span class="name">'+fmt(l.qty*l.price)+'</span></div>'});
-h+='<div class="top" style="margin-top:14px;border-top:2px solid var(--line);padding-top:10px"><span class="name">Total</span><span class="qty">'+fmt(v.total)+'</span></div>'+(v.paid!=null&&v.paid<v.total?'<div class="top sub" style="margin-top:6px"><span>Payé</span><span>'+fmt(v.paid)+'</span></div><div class="top name" style="color:var(--bad)"><span>Reste à payer</span><span>'+fmt(v.total-v.paid)+'</span></div>':'')+(sh.note?'<div class="sub" style="text-align:center;margin-top:12px">'+esc(sh.note)+'</div>':'')+'</div><div class="row"><button class="btn alt" id="pr">Imprimer</button><button class="btn" id="sh">Partager</button></div><div style="margin-top:10px"><button class="btn main" style="width:100%" id="nw">Nouvelle facture</button></div><div class="msg" id="m"></div>';
+h+='<table class="tb"><tr><th>Désignation</th><th>Quantité</th><th>PU</th><th>Prix total</th></tr>';
+function nb(x){return fmt(x).replace(" FCFA","")}
+v.lines.forEach(function(l){h+='<tr><td>'+esc(l.name)+'</td><td>'+l.qty+'</td><td>'+nb(l.price)+'</td><td>'+nb(l.qty*l.price)+'</td></tr>'});
+h+='</table>';
+h+='<div class="top" style="margin-top:14px;border-top:2px solid var(--line);padding-top:10px"><span class="name">Total</span><span class="qty">'+fmt(v.total)+'</span></div>'+(v.paid!=null&&v.paid<v.total?'<div class="top sub" style="margin-top:6px"><span>Payé</span><span>'+fmt(v.paid)+'</span></div><div class="top name" style="color:var(--bad)"><span>Reste à payer</span><span>'+fmt(v.total-v.paid)+'</span></div>':'')+(sh.note?'<div class="sub" style="text-align:center;margin-top:12px">'+esc(sh.note)+'</div>':'')+'</div><div class="row noprint"><button class="btn alt" id="pr">Imprimer</button><button class="btn" id="sh">Partager</button></div><div class="noprint" style="margin-top:10px"><button class="btn main" style="width:100%" id="nw">Nouvelle facture</button></div><div class="msg noprint" id="m"></div>';
 app.innerHTML=h;
 var m=document.getElementById("m");
 document.getElementById("nw").onclick=function(){shown=null;render()};
